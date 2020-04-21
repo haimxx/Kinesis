@@ -1,5 +1,6 @@
 #!/bin/bash
 
+REGION=us-east-1
 NAME=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 
 #send message
@@ -17,5 +18,5 @@ EOT
 
 	MESSAGE=$(echo "$MESSAGE" | base64)
 	aws kinesis put-record --stream-name kinesis-chat --partition-key 123 \
-	--data "$MESSAGE"
+	--data "$MESSAGE" --region $REGION
 done

@@ -11,10 +11,14 @@ resource "aws_kinesis_stream" "chat_stream" {
 
 
 resource "aws_instance" "producer" {
-  ami           = "ami-0323c3dd2da7fb37d"
-  instance_type = "t2.micro"
-  count         = 5
-  user_data     = file("Producer.sh")
+  ami                  = "ami-0323c3dd2da7fb37d"
+  instance_type        = "t2.micro"
+  count                = 5
+  user_data            = file("Producer.sh")
+  iam_instance_profile = aws_iam_instance_profile.kinesis_profile.name
+  depends_on = [
+    aws_kinesis_stream.chat_stream,
+  ]
 
   tags = {
     Name = element(var.instance_names, count.index)
@@ -23,10 +27,14 @@ resource "aws_instance" "producer" {
 
 
 resource "aws_instance" "consumer" {
-  ami           = "ami-0323c3dd2da7fb37d"
-  instance_type = "t2.micro"
-  key_name      = var.key_name
-  user_data     = file("Consumer.sh")
+  ami                  = "ami-0323c3dd2da7fb37d"
+  instance_type        = "t2.micro"
+  key_name             = var.key_name
+  user_data            = file("Consumer.sh")
+  iam_instance_profile = aws_iam_instance_profile.kinesis_profile.name
+  depends_on = [
+    aws_kinesis_stream.chat_stream,
+  ]
 
   tags = {
     Name = "Consumer"
